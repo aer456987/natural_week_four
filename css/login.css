@@ -1,0 +1,15 @@
+.nav_lists {
+  text-align: right;
+}
+
+.login_page {
+  overflow: hidden;
+}
+
+.bc_img {
+  background: url("https://images.unsplash.com/photo-1538440367084-0a21cb983cee?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=994&q=80");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+/*# sourceMappingURL=login.css.map */

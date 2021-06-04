@@ -1,0 +1,62 @@
+.tabelLists {
+  border: solid 1px rgba(37, 52, 45, 0.4);
+}
+
+.tabelLists th, .tabelLists td {
+  vertical-align: middle;
+  border-right: solid 1px rgba(37, 52, 45, 0.4);
+}
+
+.tabelLists img {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  img {
+    max-width: 75%;
+  }
+}
+
+tbody tr:nth-child(even) {
+  background-color: #EBF3F2;
+}
+
+.modal-dialog {
+  min-width: 1000px;
+}
+
+.modal-body img, .modal-body input, .modal-body select {
+  width: 100%;
+}
+
+label {
+  color: #25342d;
+}
+
+.form-control, .form-select {
+  color: #25342d;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #678637;
+  -webkit-box-shadow: 0 0 0 0.25rem rgba(103, 134, 55, 0.5);
+          box-shadow: 0 0 0 0.25rem rgba(103, 134, 55, 0.5);
+}
+
+.form-check .form-check-input {
+  width: 20px;
+  height: 20px;
+}
+
+.page-link:hover, .page-item.active .page-link {
+  font-weight: bold;
+  -webkit-box-shadow: 0 0 0 3px rgba(103, 134, 55, 0.5);
+          box-shadow: 0 0 0 3px rgba(103, 134, 55, 0.5);
+  color: #25342d;
+  background: #EBF3F2;
+}
+
+.page-item a {
+  color: #678637;
+}
+/*# sourceMappingURL=backstage.css.map */
