@@ -255,6 +255,8 @@ const app = Vue.createApp({
   mounted() {
     // 定義新增/修改產品視窗的元素位置
     productModal = new bootstrap.Modal(document.querySelector('.js_productModal'));
+    const token = document.cookie.replace(/(?:(?:^|.*;\s*)hexToken\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+    axios.defaults.headers.common.Authorization = token;
 
     this.getProducts();
     this.getAllProducts();
