@@ -7,11 +7,20 @@ const app = Vue.createApp({
       url: 'https://vue3-course-api.hexschool.io',
       pathApi: 'toriha_vuetestapi',
       isNew: '',
-      productsList: [],
-      pagination: {},
+      select: '全部商品',
+      pagination: {},          // 分頁
+      renderDatas: [],         // 渲染畫面用的資料
+      products: {              // 篩選商品列表
+        all: [],               // 前端商品列表
+        projects: [],          // 專案
+        feeds: [],             // 飼料
+        cages: [],             // 籠具
+        toys: [],              // 玩具
+        other: [],             // 其餘用品
+      },
       productsNum: '',
       tempProduct: {
-        imagesUrl: [],       // 圖一 ~ 圖五   
+        imagesUrl: [],         // 圖一 ~ 圖五   
       },
     }
   },
@@ -19,7 +28,7 @@ const app = Vue.createApp({
     pagination,
   },
   methods: {
-    checkLogin() {              // axios check 確認登入狀態
+    checkLogin() {                    // axios check 確認登入狀態
       const token = document.cookie.replace(/(?:(?:^|.*;\s*)hexToken\s*\=\s*([^;]*).*$)|^.*$/, '$1');
       axios.defaults.headers.common.Authorization = token;
       
@@ -37,28 +46,103 @@ const app = Vue.createApp({
           console.dir('帳號認證(失敗)', err);
         })
     },
-    getData(page = 1) {                 // axios get 取得資料
+    getProducts(page = 1) {           // axios get 取得資料
       const url = `${this.url}/api/${this.pathApi}/admin/products?page=${page}`;
       axios.get(url)
         .then(res => {
           if(res.data.success){
-            this.productsList = res.data.products;
-            this.productsNum = this.productsList.length;
+            this.renderDatas = res.data.products;
             this.pagination = res.data.pagination;
+            this.select = '全部商品';
+
             console.log('取得資料(全部資料)', res);
             console.log('取得資料(成功)', res.data.products);
-            console.log('取得this資料(成功)',this.productsList);
+            console.log('取得this資料(成功)',this.renderDatas);
           }else{
             console.log('取得資料(錯誤)', res.data.message);
           }
         })
         .catch(err => {
-          console.dir('取得資料(失敗)', err);
+          console.dir('取得資料(失敗)');
+          console.dir(err);
         })
     },
-    resetData() {               // 重新整理資料
+    getAllProducts() {                // 取得要篩選的所有資料
+      const url = `${this.url}/api/${this.pathApi}/admin/products/all`;
+      axios.get(url)
+        .then(res => {
+          if(res.data.success){
+            this.products.all = JSON.parse(JSON.stringify(res.data.products));
+            this.filterDates(res.data.products);
+
+            console.log('取得要篩選的所有資料(全部資料)', res);
+            console.log('取得要篩選的所有資料(成功)', res.data.products);
+            console.log('取得要篩選的this資料(成功)',this.products.all);
+          }else{
+            console.log('取得要篩選的所有資料(錯誤)', res.data.message);
+          }
+        })
+        .catch(err => {
+          console.dir('取得要篩選的所有資料(失敗)');
+          console.dir(err);
+        })
+    },
+    filterDates(allData) {            // 產品分類
+      const allKeys = Object.keys(allData);
+
+      this.products.all = [];
+      this.products.projects = [];
+      this.products.feeds = [];
+      this.products.cages = [];
+      this.products.toys = [];
+      this.products.other = [];
+
+      allKeys.forEach((item) => {
+        this.products.all.push(allData[item]);
+
+        if(allData[item].category === '募款專案'){
+          this.products.projects.push(allData[item]);
+
+        }else if(allData[item].category === '飼料') {
+          this.products.feeds.push(allData[item]);
+
+        }else if(allData[item].category === '籠具') {
+          this.products.cages.push(allData[item]);
+
+        }else if(allData[item].category === '玩具') {
+          this.products.toys.push(allData[item]);
+
+        }else if(allData[item].category === '其餘用品') {
+          this.products.other.push(allData[item]);
+        }
+      });
+    },
+    changeProduct(e) {                // 篩選表單功能
+      console.log(e.target.value);
+    
+      if(e.target.value === '全部商品'){
+        this.renderDatas = this.products.all;
+    
+      }else if(e.target.value === '募款專案'){
+        this.renderDatas = this.products.projects;
+    
+      }else if(e.target.value === '飼料') {
+        this.renderDatas = this.products.feeds;
+    
+      }else if(e.target.value === '籠具') {
+        this.renderDatas = this.products.cages;
+    
+      }else if(e.target.value === '玩具') {
+        this.renderDatas = this.products.toys;
+    
+      }else if(e.target.value === '其餘用品') {
+        this.renderDatas = this.products.other;
+      }
+    },
+    resetData() {                     // 重新整理資料
       this.swalFn('正在重整資料', 'info')
-      this.getData();
+      this.getProducts();
+      this.getAllProducts();
     },
     openProductModal(isNew, item) {   // 打開產品修改的視窗
       if (isNew === 'isNew'){
@@ -82,7 +166,7 @@ const app = Vue.createApp({
       }
       
     },
-    updateProduct(tempProduct){            // axios post/put 資料
+    updateProduct(tempProduct){       // axios post/put 資料
       console.log('暫存資料', tempProduct);
 
       let url = `${this.url}/api/${this.pathApi}/admin/product`;
@@ -98,7 +182,8 @@ const app = Vue.createApp({
         if(res.data.success) {
           console.log('新增/修改資料(成功)', res);
           productModal.hide();
-          this.getData();
+          this.getProducts();
+          this.getAllProducts();
           this.swalFn(res.data.message, 'success')
           }else{
             console.log('新增/修改資料(錯誤)', res);
@@ -111,7 +196,7 @@ const app = Vue.createApp({
         })
 
     },
-    deleteData(product) {       // 刪除產品
+    deleteData(product) {             // 刪除產品
       const url = `${this.url}/api/${this.pathApi}/admin/product/${product.id}`;
       console.log('id', product.id);
       axios.delete(url)
@@ -119,7 +204,8 @@ const app = Vue.createApp({
           if(res.data.success) {
             console.log('刪除資料(成功)', res);
             this.swalFn(res.data.message, 'success');
-            this.getData();
+            this.getProducts();
+            this.getAllProducts();
           }else{
             console.log('刪除資料(錯誤)', res);
             this.swalFn(res.data.message, 'error', 10000)
@@ -135,7 +221,7 @@ const app = Vue.createApp({
       const txt = { title, text, icon, button, timer };
       swal(txt);
     },
-    delSwalFn(product) {        // 刪除的確認視窗
+    delSwalFn(product) {              // 刪除的確認視窗
       const txt = {
         title: `確定要刪除 [${product.title}] 嗎？`,
         text: '請注意，刪除後將無法復原！',
@@ -159,7 +245,8 @@ const app = Vue.createApp({
     productModal = new bootstrap.Modal(document.querySelector('.js_productModal'));
 
     this.checkLogin();
-    this.getData();
+    this.getProducts();
+    this.getAllProducts()
   }
 });
 
@@ -258,6 +345,7 @@ app.component('productModal',{
                         <option value="飼料">飼料</option>
                         <option value="籠具">籠具</option>
                         <option value="玩具">玩具</option>
+                        <option value="募款專案">募款專案</option>
                         <option value="其餘用品">其餘用品</option>
                       </select>
                     </div>
