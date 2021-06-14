@@ -79,6 +79,7 @@ const app = {
         if(res.data.success){
           console.log('登入(成功)', res);
           this.loginDatas.error = '登入成功';
+          window.location.href='backstage_products.html';
         }else{
           console.log('登入(錯誤)', res.data);
           this.loginDatas.error = `${res.data.message}, 請檢察帳號密碼`;
